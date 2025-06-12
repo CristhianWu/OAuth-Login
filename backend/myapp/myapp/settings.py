@@ -12,7 +12,11 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import dj_database_url
+from myapp import supertokens_config
 from decouple import config
+from supertokens_python import init, get_all_cors_headers
+from typing import List
+from corsheaders.defaults import default_headers
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,9 +43,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'corsheaders',
+    'supertokens_python',
+    'accounts',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -49,7 +58,18 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'supertokens_python.framework.django.django_middleware.middleware',
 ]
+
+# Supertokens SDK
+# =====================================================
+init(
+    supertokens_config=supertokens_config.supertokens_config,
+    app_info=supertokens_config.app_info,
+    framework= supertokens_config.framework,
+    recipe_list=supertokens_config.recipe_list,
+)
+
 
 ROOT_URLCONF = 'myapp.urls'
 
@@ -121,3 +141,20 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Cors Config
+# ==================================================
+CORS_ORIGIN_WHITELIST = [
+    config('WEBSITE_DOMAIN')
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOWED_ORIGINS = [
+    config('WEBSITE_DOMAIN')
+]
+
+CORS_ALLOW_HEADERS: List[str] = list(default_headers) + [
+    "Content-Type"
+] + get_all_cors_headers()
+
