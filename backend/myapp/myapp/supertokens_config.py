@@ -13,7 +13,10 @@ from supertokens_python import (
     InputAppInfo,
     SupertokensConfig,
 )
-
+from .custom_email.custom_delivery import (custom_email_deliver,
+                                           custom_email_delivery)
+from .custom_email.custom_smtp import (custom_smtp_email_verification_content_override,
+                                      custom_smtp_reset_password_content_override)
 # Supertokens core
 supertokens_config = SupertokensConfig(
     connection_uri="http://supertokens:3567",
@@ -58,21 +61,21 @@ recipe_list = [
     ),
     emailverification.init(
         mode='OPTIONAL',
-#        email_delivery=EmailDeliveryConfig(
-#            override=custom_email_delivery,
-#            service=emailverification.SMTPService(
-#                smtp_settings=smtp_settings,
-#                override=custom_smtp_email_verification_content_override
-#           )
-#        )
+        email_delivery=EmailDeliveryConfig(
+            override=custom_email_delivery,
+            service=emailverification.SMTPService(
+                smtp_settings=smtp_settings,
+                override=custom_smtp_email_verification_content_override
+           )
+        )
     ),
     emailpassword.init(
-#        email_delivery=EmailDeliveryConfig(
-#            service=EPSMTPService(
-#                smtp_settings=smtp_settings,
-#                override=custom_smtp_reset_password_content_override
-#            )
-#        )
+        email_delivery=EmailDeliveryConfig(
+            service=EPSMTPService(
+                smtp_settings=smtp_settings,
+                override=custom_smtp_reset_password_content_override
+            )
+        )
     ),
     dashboard.init(),
     userroles.init(),

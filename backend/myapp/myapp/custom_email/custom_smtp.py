@@ -2,7 +2,6 @@ from supertokens_python.recipe.emailverification.types import SMTPOverrideInput 
 from supertokens_python.recipe.emailpassword.types import SMTPOverrideInput, EmailTemplateVars
 from supertokens_python.ingredients.emaildelivery.types import EmailContent
 from typing import Dict, Any
-from supertokens_python.recipe.emailpassword.types import EmailDeliveryOverrideInput, EmailTemplateVars
 
 
 def custom_smtp_reset_password_content_override(original_implementation: SMTPOverrideInput) -> SMTPOverrideInput:
@@ -137,14 +136,3 @@ def custom_smtp_email_verification_content_override(original_implementation: EVS
 
 
 
-def custom_email_deliver(original_implementation: EmailDeliveryOverrideInput) -> EmailDeliveryOverrideInput:
-    original_send_email = original_implementation.send_email
-
-    async def send_email(template_vars: EmailTemplateVars, user_context: Dict[str, Any]) -> None:
-        # This is: `<YOUR_WEBSITE_DOMAIN>/auth/reset-password`
-        template_vars.password_reset_link = template_vars.password_reset_link.replace(
-            "http://localhost:3000/auth/reset-password", "http://localhost:3000/your/path")
-        return await original_send_email(template_vars, user_context)
-
-    original_implementation.send_email = send_email
-    return original_implementation
