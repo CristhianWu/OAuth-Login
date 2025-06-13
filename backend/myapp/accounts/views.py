@@ -122,3 +122,21 @@ class LoginUserView(APIView):
 
         except Exception as e:
             return Response({'error': str(e)}, status=400)
+        
+
+class LogoutUserView(APIView):
+    def post(self, request):
+        try:
+            # Obtener la sesión actual
+            session = get_session(request)
+
+            if session is None:
+                return Response({'mensaje': 'There is no active session'}, status=401)
+
+            # Revoke session
+            revoke_session(session.get_handle())
+
+            return Response({'message': 'Logout Successfully'}, status=200)
+
+        except Exception as e:
+            return Response({'error': f"Logout error: {str(e)}"}, status=400)
