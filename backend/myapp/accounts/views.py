@@ -77,3 +77,48 @@ class UserRegisterView(APIView):
         except Exception as e:
             print(f"[Error] Registro: {e}")
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+class LoginUserView(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        password = request.data.get('password')
+
+        if not email or not password:
+            return Response({'error': 'Both email and password are required'}, status=400)
+
+        tenant_id = "public"
+
+        try:
+            # Login from supertokens
+            user = sign_in(
+                tenant_id=tenant_id,
+                email=email,
+                password=password
+            )
+
+            # Manually create session
+            session = create_new_session(
+                request=request,
+                tenant_id=tenant_id,
+                recipe_user_id=RecipeUserId(user.user.id)
+            )
+
+            # User data ready to be returned
+            user_data = {
+                "user_id": user.user.id,
+                "email": user.user.emails,
+                "time_joined": user.user.time_joined,
+            }
+
+            access_token = session.access_token
+
+            return Response({
+                'mensaje': 'Usuario logeado con éxito',
+                'user': user_data,
+                'tokens': {
+                    'access_token': access_token,
+                }
+            }, status=200)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=400)
